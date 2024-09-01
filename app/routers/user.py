@@ -16,11 +16,11 @@ router = APIRouter(
 
 
 @router.get('/', response_model=List[schemes.UserReturn])
-def get_users(page=1, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+def get_users(page=1, db: Session = Depends(get_db)):
     return db.query(User).offset((page - 1) * 50).limit(50)
 
 
-@router.post('/', response_model=schemes.UserReturn)
+@router.post('/', response_model=schemes.UserReturn, status_code=status.HTTP_201_CREATED)
 def create_user(body: schemes.UserCreate, db: Session = Depends(get_db)):
     if db.query(User).filter(User.username == body.username).first():
         raise HTTPException(status.HTTP_409_CONFLICT, 'user with such username already exists')

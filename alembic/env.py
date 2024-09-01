@@ -10,6 +10,7 @@ from app.database import Base, SQLALCHEMY_URL
 # access to the values within the .ini file in use.
 config = context.config
 config.set_main_option('sqlalchemy.url', SQLALCHEMY_URL)
+
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
