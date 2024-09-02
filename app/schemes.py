@@ -19,6 +19,14 @@ class UserUpdate(BaseModel):
     password: str
 
 
+class PartialUpdateUser(BaseModel):
+    email: Optional[EmailStr] = None
+    username: Optional[str] = None
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    password: Optional[str] = None
+
+
 class UserReturn(BaseModel):
     id: int
     email: EmailStr
