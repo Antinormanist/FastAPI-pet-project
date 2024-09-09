@@ -6,7 +6,6 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Cart, User
 from app.routers.auth import get_current_user
-from app import schemes
 
 router = APIRouter(
     tags=['Purchase'],
@@ -15,21 +14,34 @@ router = APIRouter(
 
 
 @router.post('/')
-def buy_products(buy: bool, db: Session = Depends(get_db), user = Depends(get_current_user)):
-    products = db.query(Cart).filter(Cart.owner_id == user.id)
+def buy_products(db: Session = Depends(get_db), user = Depends(get_current_user)):
+    products = db.query(Cart).filter(Cart.owner_id == user.id).all()
     total_price = 0
     bananas = []
     for prod in products:
         total_price += prod.banana.price
         bananas.append(prod.banana.name)
-    if total_price < user.wallet:
-        raise HTTPException(status.HTTP_406_NOT_ACCEPTABLE, f'you don\'t have enough money. You have {user.wallet} you need to have {total_price}')
+    if user.wallet < total_price:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, f'you don\'t have enough money. You have {user.wallet} you need to have {total_price}')
     user.wallet -= total_price
     for prod in products:
-        id = prod.owner_id
+        id = prod.banana.owner_id
         us = db.query(User).filter(User.id == id).first()
         if us:
-            us.wallet += prod.price
-    products.delete()
+            us.wallet += prod.banana.price
+        db.delete(prod)
     db.commit()
     return {'message': 'You successfully bought it.'}
+
+
+# @router.get('/money')
+# def get_money(db: Session = Depends(get_db), user = Depends(get_current_user)):
+#     """
+#     FUNCTION FOR TESTS
+#     :param db:
+#     :param user:
+#     :return:
+#     """
+#     user.wallet = 1000
+#     db.commit()
+#     db.refresh(user)
