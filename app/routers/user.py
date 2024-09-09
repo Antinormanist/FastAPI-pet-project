@@ -19,7 +19,8 @@ router = APIRouter(
 def get_users(page: int = 1, db: Session = Depends(get_db)):
     if page < 1:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, 'page must be a positive integer')
-    return db.query(User).offset((page - 1) * 20).limit(20)
+    limit = 20
+    return db.query(User).offset((page - 1) * limit).limit(limit)
 
 
 @router.get('/{id}', response_model=schemes.UserReturn)

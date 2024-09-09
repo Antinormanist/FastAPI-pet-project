@@ -32,6 +32,7 @@ def test_get_user_by_id(client, create_user):
     response = client.get(f'/users/{create_user['id']}')
     assert response.status_code == 200
     assert response.json()['username'] == create_user['username']
+    assert response.json()['wallet'] == create_user['wallet']
 
 
 def test_get_invalid_user_by_id(client):
